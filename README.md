@@ -13,6 +13,10 @@ This guide explains how to safely install **Void Kernel** and **VoidSU** on supp
 
 | Device | Codename |
 |---|---|
+| Redmi Note 9 Pro Max | `excalibur` |
+| Redmi Note 9 Pro (global) | `joyeuse` |
+| Redmi Note 9 Pro (India) | `curtana` |
+| Redmi Note 9S | `curtana` |
 | POCO M2 Pro | `gram` |
 | Xiaomi Miatoll family | `miatoll` |
 
@@ -48,13 +52,7 @@ Before starting, make sure you have:
 - A PC with `adb` and `fastboot`
 - A complete backup of important data
 - The correct Void Kernel release
-- The correct VoidSU Manager APK, if you want root management
-
-Recommended:
-
-- At least 50% battery
-- An original or reliable USB cable
-- A known-working stock/custom boot image for recovery
+- The VoidSU Manager APK, if you want root management
 
 ## 2. Install ADB & Fastboot
 
@@ -102,8 +100,7 @@ A kernel flash normally does not require wiping your data, but always keep a rec
 At minimum, keep:
 
 - The current boot image
-- The current `vendor_boot` image, if your ROM uses one
-- The recovery image
+- The currnet dtbo imgage
 - Important personal files
 
 If you already have a working kernel, save it before replacing it.
