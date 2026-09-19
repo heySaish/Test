@@ -32,6 +32,7 @@ Built with **React 18**, **Vite**, **TypeScript**, **Tailwind CSS**, and **Lucid
 │   │   ├── CopyButton.tsx
 │   │   ├── Footer.tsx
 │   │   ├── Navbar.tsx
+│   │   ├── ScrollToTop.tsx
 │   │   └── TerminalBackground.tsx
 │   ├── data/                # Centralized project data files
 │   │   ├── changelogData.ts
@@ -41,17 +42,18 @@ Built with **React 18**, **Vite**, **TypeScript**, **Tailwind CSS**, and **Lucid
 │   │   ├── downloadsData.ts
 │   │   ├── featuresData.ts
 │   │   └── voidsuData.ts
-│   ├── sections/            # Web page content sections
-│   │   ├── AboutSection.tsx
-│   │   ├── ChangelogSection.tsx
-│   │   ├── DeviceSupportSection.tsx
-│   │   ├── DocumentationSection.tsx
-│   │   ├── DownloadsSection.tsx
-│   │   ├── FeaturesSection.tsx
-│   │   ├── HeroSection.tsx
-│   │   ├── TechnicalDashboardSection.tsx
-│   │   └── VoidSuSection.tsx
-│   ├── App.tsx              # Main application container
+│   ├── pages/               # Multi-page React Router pages
+│   │   ├── AboutPage.tsx    # /about
+│   │   ├── ChangelogPage.tsx# /changelog
+│   │   ├── DashboardPage.tsx# /dashboard
+│   │   ├── DevicesPage.tsx  # /devices
+│   │   ├── DocsPage.tsx     # /docs
+│   │   ├── DownloadsPage.tsx# /downloads
+│   │   ├── FeaturesPage.tsx # /features
+│   │   ├── HomePage.tsx     # /
+│   │   └── VoidSuPage.tsx   # /voidsu
+│   ├── sections/            # Feature & detail content sections
+│   ├── App.tsx              # React Router setup & route mapping
 │   ├── index.css            # Tailwind directives & terminal custom styles
 │   └── main.tsx             # React DOM root entry
 ├── index.html               # Primary HTML with SEO meta tags

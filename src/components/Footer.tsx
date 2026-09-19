@@ -1,11 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Terminal, Github, Shield, FileText, ArrowUp } from 'lucide-react';
 
-interface FooterProps {
-  onNavigate: (sectionId: string) => void;
-}
-
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+export const Footer: React.FC = () => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -46,24 +43,24 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <button onClick={() => onNavigate('features')} className="hover:text-emerald-400 transition-colors">
+                <Link to="/features" className="hover:text-emerald-400 transition-colors">
                   Kernel Features
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => onNavigate('dashboard')} className="hover:text-emerald-400 transition-colors">
+                <Link to="/dashboard" className="hover:text-emerald-400 transition-colors">
                   System Dashboard
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => onNavigate('devices')} className="hover:text-emerald-400 transition-colors">
+                <Link to="/devices" className="hover:text-emerald-400 transition-colors">
                   Supported Devices (gram/miatoll)
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => onNavigate('downloads')} className="hover:text-emerald-400 transition-colors">
+                <Link to="/downloads" className="hover:text-emerald-400 transition-colors">
                   Downloads & Releases
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
@@ -75,15 +72,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <button onClick={() => onNavigate('voidsu')} className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                <Link to="/voidsu" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-cyan-400" />
                   <span>VoidSU Overview</span>
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => onNavigate('docs')} className="hover:text-emerald-400 transition-colors">
+                <Link to="/docs" className="hover:text-emerald-400 transition-colors">
                   VoidSU Setup Guide
-                </button>
+                </Link>
               </li>
               <li>
                 <a href="https://github.com/heySaish/VoidSU" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">
@@ -91,9 +88,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('changelog')} className="hover:text-emerald-400 transition-colors">
+                <Link to="/changelog" className="hover:text-emerald-400 transition-colors">
                   Ecosystem Changelog
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
@@ -117,9 +114,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('about')} className="hover:text-emerald-400 transition-colors">
+                <Link to="/about" className="hover:text-emerald-400 transition-colors">
                   Project Philosophy & About
-                </button>
+                </Link>
               </li>
               <li className="pt-1">
                 <span className="font-mono text-[11px] text-zinc-500">
