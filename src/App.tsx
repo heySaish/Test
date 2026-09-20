@@ -17,7 +17,7 @@ import { AboutPage } from './pages/AboutPage';
 
 export const App: React.FC = () => {
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <ScrollToTop />
       <div className="min-h-screen bg-[#050508] text-zinc-100 flex flex-col font-sans relative selection:bg-emerald-500/30 selection:text-emerald-300 overflow-x-hidden">
         {/* Background Animation Canvas */}
