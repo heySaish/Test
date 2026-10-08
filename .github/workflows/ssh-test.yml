@@ -1,7 +1,7 @@
 name: Secure SSH Debugging with tmate
 
 on:
-  workflow_dispatch: # Taaki tu GitHub UI se manually 'Run workflow' par click karke start kar sake
+  workflow_dispatch:
 
 jobs:
   debug-session:
@@ -13,16 +13,32 @@ jobs:
 
       - name: Fix OpenSSH Privilege Separation Directory Error
         run: |
-          echo "[-] OpenSSH configuration fix apply kar rahe hain..."
-          # Privilege separation directory create karna aur sahi permissions set karna
           sudo mkdir -p /var/run/sshd /run/sshd
           sudo chmod 0755 /var/run/sshd /run/sshd
           sudo chown root:root /var/run/sshd /run/sshd
-          echo "[+] Sahi directories set ho gayi hain!"
 
-      - name: Setup tmate Session and Debug
+      # Hum tmate ko bolenge ki background me chalo aur link output me save karo
+      - name: Setup tmate Session
+        id: tmate
         uses: mxschmitt/action-tmate@v3
         with:
-          # (Optional) Sirf tere account ke liye access restrict karne ke liye (Security ke liye achha hai)
           limit-access-to-actor: false
+          detached: true # Ye logs ko freeze hone se bachayega
+
+      # Yeh step force karega ki link logs me print ho jaye bina freeze hue
+      - name: Print Connection String
+        run: |
+          echo "========================================="
+          echo "SSH COMMAND: ${{ steps.tmate.outputs.ssh-command }}"
+          echo "WEB URL: ${{ steps.tmate.outputs.web-url }}"
+          echo "========================================="
+          
+      # Yeh runner ko hold par rakhega taaki server chalta rahe
+      - name: Keep Alive For Debugging
+        run: |
+          echo "Waiting for your Termux connection..."
+          # Jab tak tu connect karke 'continue' file nahi banayega, tab tak wait karega
+          while [ ! -f /tmp/keepalive_stop ] && [ ! -f continue ] && [ ! -f /continue ]; do
+            sleep 5
+          done
 
