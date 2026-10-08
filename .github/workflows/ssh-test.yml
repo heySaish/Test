@@ -24,5 +24,5 @@ jobs:
         uses: mxschmitt/action-tmate@v3
         with:
           # (Optional) Sirf tere account ke liye access restrict karne ke liye (Security ke liye achha hai)
-          limit-access-to-actor: true
+          limit-access-to-actor: false
 
