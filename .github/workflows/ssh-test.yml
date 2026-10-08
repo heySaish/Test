@@ -1,61 +1,52 @@
-name: SSH Server Test
+name: Termux SSH via Pinggy
 
 on:
   workflow_dispatch:
 
 jobs:
-  ssh-test:
+  pinggy-ssh:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install SSH server and sshpass
+      - name: Configure Runner Password
         run: |
-          sudo apt-get update
-          sudo apt-get install -y openssh-server sshpass
-
-      - name: Configure SSH
-        run: |
-          sudo mkdir -p /run/sshd
-
-          # Create temporary test user
-          sudo useradd -m -s /bin/bash testssh
-          echo 'testssh:test123' | sudo chpasswd
-
-          # Make sure password authentication is enabled
-          echo 'PasswordAuthentication yes' | sudo tee /etc/ssh/sshd_config.d/test.conf
-
-          # Validate configuration
+          # Default runner user ka password set kiya
+          echo 'runner:voidpass123' | sudo chpasswd
+          echo 'PasswordAuthentication yes' | sudo tee /etc/ssh/sshd_config.d/termux.conf
           sudo sshd -t
+          sudo systemctl restart ssh || sudo /usr/sbin/sshd
 
-      - name: Start SSH server
+      - name: Start Pinggy Tunnel & Print Connect Command
         run: |
-          sudo /usr/sbin/sshd
-
-      - name: Verify SSH listener
-        run: |
-          echo "=== Listening on port 22 ==="
-          sudo ss -lntp | grep ':22'
-
-      - name: Test SSH connection
-        run: |
-          sshpass -p 'test123' ssh \
+          # Pinggy reverse tunnel background me chalu
+          ssh -p 443 -R0:localhost:22 \
             -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null \
-            -o PreferredAuthentications=password \
-            -o PubkeyAuthentication=no \
-            testssh@localhost \
-            'echo "🔥 SSH WORKS INSIDE RUNNER"; echo "User: $(whoami)"; echo "Host: $(hostname)"'
+            -o ServerAliveInterval=30 \
+            -o TCPKeepAlive=yes \
+            a.pinggy.io > pinggy.log 2>&1 &
 
-      - name: SSH server status
-        if: always()
+          # Tunnel URL aane ka wait
+          sleep 6
+
+          echo "=========================================="
+          echo "🔥 TERA PINGGY SSH COMMAND 🔥"
+          echo "=========================================="
+          
+          # Exact command filter karke print karo
+          SSH_CMD=$(grep -o 'ssh -p [0-9]* [^ ]*' pinggy.log | head -n 1)
+          if [ -n "$SSH_CMD" ]; then
+            echo "$SSH_CMD" | sed 's/ssh/ssh runner@/'
+          else
+            cat pinggy.log
+          fi
+          
+          echo "=========================================="
+          echo "Password: voidpass123"
+          echo "=========================================="
+
+      - name: Keep Runner Alive
         run: |
-          echo "=== SSH processes ==="
-          pgrep -a sshd || true
+          echo "Session live hai! Connect kar aur mauj le 😈"
+          # Max 6 hours tak runner zinda rahega (GitHub Actions limit)
+          sleep 21600
 
-          echo "=== Port 22 ==="
-          sudo ss -lntp | grep ':22' || true
-
-      - name: Keep runner alive briefly
-        run: |
-          echo "SSH test completed."
-          sleep 30
