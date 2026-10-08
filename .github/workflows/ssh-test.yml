@@ -1,60 +1,28 @@
-name: Termux SSH via Pinggy
+name: Secure SSH Debugging with tmate
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Taaki tu GitHub UI se manually 'Run workflow' par click karke start kar sake
 
 jobs:
-  pinggy-ssh:
+  debug-session:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup SSH Server
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Fix OpenSSH Privilege Separation Directory Error
         run: |
-          # Missing directory fix
-          sudo mkdir -p /run/sshd
-          sudo chmod 0755 /run/sshd
+          echo "[-] OpenSSH configuration fix apply kar rahe hain..."
+          # Privilege separation directory create karna aur sahi permissions set karna
+          sudo mkdir -p /var/run/sshd /run/sshd
+          sudo chmod 0755 /var/run/sshd /run/sshd
+          sudo chown root:root /var/run/sshd /run/sshd
+          echo "[+] Sahi directories set ho gayi hain!"
 
-          # Runner password set karo
-          echo 'runner:voidpass123' | sudo chpasswd
-
-          # Password login enable
-          echo 'PasswordAuthentication yes' | sudo tee /etc/ssh/sshd_config.d/termux.conf
-
-          # Host keys verify & sshd start
-          sudo ssh-keygen -A
-          sudo /usr/sbin/sshd
-
-      - name: Start Pinggy Tunnel & Print Connect Command
-        run: |
-          # Reverse tunnel start in background
-          ssh -p 443 -R0:localhost:22 \
-            -o StrictHostKeyChecking=no \
-            -o ServerAliveInterval=30 \
-            -o TCPKeepAlive=yes \
-            a.pinggy.io > pinggy.log 2>&1 &
-
-          # Tunnel connect hone ka intezar
-          sleep 7
-
-          echo "=========================================="
-          echo "🔥 TERA PINGGY SSH COMMAND 🔥"
-          echo "=========================================="
-          
-          # Exact command extract karke print karo
-          SSH_CMD=$(grep -o 'ssh -p [0-9]* [^ ]*' pinggy.log | head -n 1)
-          if [ -n "$SSH_CMD" ]; then
-            echo "$SSH_CMD" | sed 's/ssh /ssh runner@/'
-          else
-            cat pinggy.log
-          fi
-          
-          echo "=========================================="
-          echo "Password: voidpass123"
-          echo "=========================================="
-
-      - name: Keep Runner Alive
-        run: |
-          echo "Runner connected! Terminal ready hai 😈"
-          # 6 ghante tak active rahega
-          sleep 21600
+      - name: Setup tmate Session and Debug
+        uses: mxschmitt/action-tmate@v3
+        with:
+          # (Optional) Sirf tere account ke liye access restrict karne ke liye (Security ke liye achha hai)
+          limit-access-to-actor: true
 
