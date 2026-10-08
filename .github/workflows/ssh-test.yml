@@ -8,34 +8,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Configure Runner Password
+      - name: Setup SSH Server
         run: |
-          # Default runner user ka password set kiya
+          # Missing directory fix
+          sudo mkdir -p /run/sshd
+          sudo chmod 0755 /run/sshd
+
+          # Runner password set karo
           echo 'runner:voidpass123' | sudo chpasswd
+
+          # Password login enable
           echo 'PasswordAuthentication yes' | sudo tee /etc/ssh/sshd_config.d/termux.conf
-          sudo sshd -t
-          sudo systemctl restart ssh || sudo /usr/sbin/sshd
+
+          # Host keys verify & sshd start
+          sudo ssh-keygen -A
+          sudo /usr/sbin/sshd
 
       - name: Start Pinggy Tunnel & Print Connect Command
         run: |
-          # Pinggy reverse tunnel background me chalu
+          # Reverse tunnel start in background
           ssh -p 443 -R0:localhost:22 \
             -o StrictHostKeyChecking=no \
             -o ServerAliveInterval=30 \
             -o TCPKeepAlive=yes \
             a.pinggy.io > pinggy.log 2>&1 &
 
-          # Tunnel URL aane ka wait
-          sleep 6
+          # Tunnel connect hone ka intezar
+          sleep 7
 
           echo "=========================================="
           echo "🔥 TERA PINGGY SSH COMMAND 🔥"
           echo "=========================================="
           
-          # Exact command filter karke print karo
+          # Exact command extract karke print karo
           SSH_CMD=$(grep -o 'ssh -p [0-9]* [^ ]*' pinggy.log | head -n 1)
           if [ -n "$SSH_CMD" ]; then
-            echo "$SSH_CMD" | sed 's/ssh/ssh runner@/'
+            echo "$SSH_CMD" | sed 's/ssh /ssh runner@/'
           else
             cat pinggy.log
           fi
@@ -46,7 +54,7 @@ jobs:
 
       - name: Keep Runner Alive
         run: |
-          echo "Session live hai! Connect kar aur mauj le 😈"
-          # Max 6 hours tak runner zinda rahega (GitHub Actions limit)
+          echo "Runner connected! Terminal ready hai 😈"
+          # 6 ghante tak active rahega
           sleep 21600
 
