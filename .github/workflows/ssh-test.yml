@@ -8,27 +8,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install SSH server
+      - name: Install SSH server and sshpass
         run: |
           sudo apt-get update
-          sudo apt-get install -y openssh-server
+          sudo apt-get install -y openssh-server sshpass
+
+      - name: Configure SSH
+        run: |
+          sudo mkdir -p /run/sshd
+
+          # Create temporary test user
+          sudo useradd -m -s /bin/bash testssh
+          echo 'testssh:test123' | sudo chpasswd
+
+          # Make sure password authentication is enabled
+          echo 'PasswordAuthentication yes' | sudo tee /etc/ssh/sshd_config.d/test.conf
+
+          # Validate configuration
+          sudo sshd -t
 
       - name: Start SSH server
         run: |
-          sudo mkdir -p /run/sshd
           sudo /usr/sbin/sshd
-          sudo systemctl status ssh --no-pager || true
 
       - name: Verify SSH listener
         run: |
-          ss -lntp | grep ':22'
-          ssh -o StrictHostKeyChecking=no localhost 'echo "SSH works!"'
+          echo "=== Listening on port 22 ==="
+          sudo ss -lntp | grep ':22'
 
-      - name: Runner info
+      - name: Test SSH connection
         run: |
-          echo "Hostname: $(hostname)"
-          echo "User: $(whoami)"
-          echo "SSH server test completed."
+          sshpass -p 'test123' ssh \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o PreferredAuthentications=password \
+            -o PubkeyAuthentication=no \
+            testssh@localhost \
+            'echo "🔥 SSH WORKS INSIDE RUNNER"; echo "User: $(whoami)"; echo "Host: $(hostname)"'
+
+      - name: SSH server status
+        if: always()
+        run: |
+          echo "=== SSH processes ==="
+          pgrep -a sshd || true
+
+          echo "=== Port 22 ==="
+          sudo ss -lntp | grep ':22' || true
 
       - name: Keep runner alive briefly
-        run: sleep 30a
+        run: |
+          echo "SSH test completed."
+          sleep 30
