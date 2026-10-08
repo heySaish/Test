@@ -1,0 +1,34 @@
+name: SSH Server Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ssh-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install SSH server
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openssh-server
+
+      - name: Start SSH server
+        run: |
+          sudo mkdir -p /run/sshd
+          sudo /usr/sbin/sshd
+          sudo systemctl status ssh --no-pager || true
+
+      - name: Verify SSH listener
+        run: |
+          ss -lntp | grep ':22'
+          ssh -o StrictHostKeyChecking=no localhost 'echo "SSH works!"'
+
+      - name: Runner info
+        run: |
+          echo "Hostname: $(hostname)"
+          echo "User: $(whoami)"
+          echo "SSH server test completed."
+
+      - name: Keep runner alive briefly
+        run: sleep 30a
