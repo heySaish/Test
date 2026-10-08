@@ -17,28 +17,29 @@ jobs:
           sudo chmod 0755 /var/run/sshd /run/sshd
           sudo chown root:root /var/run/sshd /run/sshd
 
-      # Hum tmate ko bolenge ki background me chalo aur link output me save karo
+      # Is step ko dhyan se dalo, bina kisi galat space ke
       - name: Setup tmate Session
         id: tmate
         uses: mxschmitt/action-tmate@v3
         with:
           limit-access-to-actor: false
-          detached: true # Ye logs ko freeze hone se bachayega
+          detached: true # Isko true rakhna zaroori hai taaki ye next step par jaye
 
-      # Yeh step force karega ki link logs me print ho jaye bina freeze hue
+      # Is step ka chalna zaroori hai tabhi screen par print hoga!
       - name: Print Connection String
         run: |
           echo "========================================="
-          echo "SSH COMMAND: ${{ steps.tmate.outputs.ssh-command }}"
-          echo "WEB URL: ${{ steps.tmate.outputs.web-url }}"
+          echo "TERMTUX SSH COMMAND:"
+          echo "${{ steps.tmate.outputs.ssh-command }}"
           echo "========================================="
-          
-      # Yeh runner ko hold par rakhega taaki server chalta rahe
+          echo "WEB INTERFACE URL:"
+          echo "${{ steps.tmate.outputs.web-url }}"
+          echo "========================================="
+
       - name: Keep Alive For Debugging
         run: |
-          echo "Waiting for your Termux connection..."
-          # Jab tak tu connect karke 'continue' file nahi banayega, tab tak wait karega
-          while [ ! -f /tmp/keepalive_stop ] && [ ! -f continue ] && [ ! -f /continue ]; do
+          echo "Waiting for Termux connection... Exit karne ke liye Termux me 'touch continue' run karein."
+          while [ ! -f continue ] && [ ! -f /continue ]; do
             sleep 5
           done
 
