@@ -1,4 +1,4 @@
-name: Secure SSH Debugging with tmate
+name: SSH Debugging with Upterm
 
 on:
   workflow_dispatch:
@@ -6,40 +6,15 @@ on:
 jobs:
   debug-session:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Fix OpenSSH Privilege Separation Directory Error
-        run: |
-          sudo mkdir -p /var/run/sshd /run/sshd
-          sudo chmod 0755 /var/run/sshd /run/sshd
-          sudo chown root:root /var/run/sshd /run/sshd
-
-      # Is step ko dhyan se dalo, bina kisi galat space ke
-      - name: Setup tmate Session
-        id: tmate
-        uses: mxschmitt/action-tmate@v3
+      - name: Setup Upterm Session
+        uses: owenthereal/action-upterm@v2
         with:
-          limit-access-to-actor: false
-          detached: true # Isko true rakhna zaroori hai taaki ye next step par jaye
+          wait-timeout-minutes: 15
 
-      # Is step ka chalna zaroori hai tabhi screen par print hoga!
-      - name: Print Connection String
-        run: |
-          echo "========================================="
-          echo "TERMTUX SSH COMMAND:"
-          echo "${{ steps.tmate.outputs.ssh-command }}"
-          echo "========================================="
-          echo "WEB INTERFACE URL:"
-          echo "${{ steps.tmate.outputs.web-url }}"
-          echo "========================================="
-
-      - name: Keep Alive For Debugging
-        run: |
-          echo "Waiting for Termux connection... Exit karne ke liye Termux me 'touch continue' run karein."
-          while [ ! -f continue ] && [ ! -f /continue ]; do
-            sleep 5
-          done
 
